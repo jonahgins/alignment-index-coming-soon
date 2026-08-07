@@ -360,12 +360,19 @@
     // Touch: when a long address overflows the input, a horizontal drag
     // pans it. Some mobile browsers start text selection instead of
     // scrolling a dragged input, so translate the drag ourselves —
-    // only while there's actually hidden text.
+    // only while there's actually hidden text, and only for drags that
+    // begin promptly: a drag after a long press is the selection
+    // gesture, and that touch stays native.
+    const LONG_PRESS_MS = 400;
     let touchX = null;
+    let touchStart = 0;
+    let panning = false;
     input.addEventListener(
       "touchstart",
       (event) => {
         touchX = event.touches[0].clientX;
+        touchStart = Date.now();
+        panning = false;
       },
       { passive: true },
     );
@@ -373,6 +380,13 @@
       "touchmove",
       (event) => {
         if (touchX === null || input.scrollWidth <= input.clientWidth) return;
+        if (!panning) {
+          if (Date.now() - touchStart > LONG_PRESS_MS) {
+            touchX = null; // long press first — selection owns this touch
+            return;
+          }
+          panning = true;
+        }
         const x = event.touches[0].clientX;
         input.scrollLeft += touchX - x;
         touchX = x;
@@ -382,6 +396,7 @@
     );
     input.addEventListener("touchend", () => {
       touchX = null;
+      panning = false;
     });
     input.addEventListener("blur", () => {
       if (!input.value) restore();
