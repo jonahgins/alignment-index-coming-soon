@@ -316,8 +316,10 @@
       text.replace(/[^A-Za-z0-9.!#$%&'*+/=?^_`{|}~@-]/g, "");
 
     // The server's validity test, mirrored: the arrow only appears for
-    // addresses the endpoint will actually accept.
-    const VALID = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    // addresses the endpoint will actually accept. The first character
+    // additionally excludes Sheets' formula/text markers (= + - @ '),
+    // which the server rejects against formula injection.
+    const VALID = /^[^\s@=+'-][^\s@]*@[^\s@]+\.[^\s@]+$/;
 
     const update = () => {
       size();
