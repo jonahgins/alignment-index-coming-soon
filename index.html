@@ -149,7 +149,9 @@
     .newsletter-form.sending .arrow-icon { display: none; }
     .newsletter-form.sending .spinner {
       display: block;
-      animation: spin 700ms linear infinite;
+      /* Slow enough that the stroke holds its apparent weight — fast
+         rotation smears it thin. */
+      animation: spin 1400ms linear infinite;
     }
     .newsletter-form.sending .newsletter-submit { pointer-events: none; }
     @keyframes spin {
