@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light dark">
+  <meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#0f0f0f" media="(prefers-color-scheme: dark)">
+  <meta name="robots" content="noindex">
+  <title>Page not found · The Alignment Index</title>
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png">
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+  <style>
+    /* Same world as index.html, reduced to what this page uses. */
+    :root {
+      color-scheme: light dark;
+      --bg: #ffffff;
+      --n400: #a3a3a3;
+      --n600: #525252;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg: #0f0f0f;
+        --n400: #8a8a8a;
+        --n600: #c7c7c7;
+      }
+    }
+
+    html, body {
+      height: 100%;
+      overflow: hidden;
+      overscroll-behavior: none;
+      background: var(--bg);
+    }
+    body {
+      margin: 0;
+      color: var(--n600);
+      -webkit-tap-highlight-color: transparent;
+      font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+      font-weight: 500;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .wordmark {
+      font-size: 24px;
+      font-weight: 500;
+      color: var(--n600);
+      margin: 0 0 16px;
+    }
+    .note {
+      font-size: 20px;
+      color: var(--n400);
+      margin: 0 0 12px;
+    }
+    .home {
+      font-size: 14px;
+      color: var(--n400);
+      text-decoration: none;
+      transition: color 150ms ease;
+    }
+    @media (hover: hover) {
+      .home:hover { color: var(--n600); }
+    }
+  </style>
+</head>
+<body>
+  <h1 class="wordmark">The Alignment Index</h1>
+  <p class="note">(this page doesn&rsquo;t exist)</p>
+  <a class="home" href="/">Go home</a>
+</body>
+</html>
