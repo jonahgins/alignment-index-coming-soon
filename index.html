@@ -136,19 +136,17 @@
       cursor: pointer;
       opacity: 0;
       pointer-events: none;
-      /* Hiding is instant — it happens when the address stops being
-         valid, and a fade-out would linger over stale state. The
-         entrance transition lives on .ready below. */
-      transition: color 150ms ease;
+      /* Enter and exit both animate: fade with the slide, on the same
+         curve as the form's re-center shift. */
+      transition:
+        opacity 300ms ease,
+        transform 300ms cubic-bezier(0.22, 1, 0.36, 1),
+        color 150ms ease;
     }
     .newsletter-form.ready .newsletter-submit {
       opacity: 1;
       transform: translate(0, -50%);
       pointer-events: auto;
-      transition:
-        opacity 300ms ease,
-        transform 300ms cubic-bezier(0.22, 1, 0.36, 1),
-        color 150ms ease;
     }
     .newsletter-submit:hover { color: var(--n700); }
     .newsletter-submit svg { display: block; }
@@ -164,7 +162,7 @@
     @media (prefers-reduced-motion: reduce) {
       .newsletter-form { transition: none; }
       .form-note { transition: none; }
-      .newsletter-form.ready .newsletter-submit {
+      .newsletter-submit {
         transition: opacity 300ms ease, color 150ms ease;
       }
     }
