@@ -359,45 +359,69 @@
     });
     // Touch: when a long address overflows the input, a horizontal drag
     // pans it. Some mobile browsers start text selection instead of
-    // scrolling a dragged input, so translate the drag ourselves —
-    // only while there's actually hidden text, and only for drags that
-    // begin promptly: a drag after a long press is the selection
-    // gesture, and that touch stays native.
-    const LONG_PRESS_MS = 400;
-    let touchX = null;
-    let touchStart = 0;
-    let panning = false;
+    // scrolling a dragged input, so translate the drag ourselves — but
+    // only claim a touch that travels ≥ PAN_SLOP horizontally within
+    // LONG_PRESS_MS. Under the slop radius a pressed finger still emits
+    // jittery touchmoves, and preventDefault-ing those would kill the
+    // OS's own long-press (caret/selection) recognition — so until the
+    // gate is passed, every event is left fully native. A touch that
+    // times out, moves mostly vertically, or gets claimed by the system
+    // (touchcancel) stays native for its whole life.
+    const LONG_PRESS_MS = 400; // under iOS's ~500ms recognizer
+    const PAN_SLOP = 10; // px, ≈ the OS recognizers' own drift allowance
+    let pressX = null;
+    let pressY = 0;
+    let pressT = 0;
+    let panX = null; // non-null once the pan gate is passed
+    let dead = false;
+    const endTouch = () => {
+      pressX = null;
+      panX = null;
+      dead = false;
+    };
     input.addEventListener(
       "touchstart",
       (event) => {
-        touchX = event.touches[0].clientX;
-        touchStart = Date.now();
-        panning = false;
+        pressX = event.touches[0].clientX;
+        pressY = event.touches[0].clientY;
+        pressT = Date.now();
+        panX = null;
+        dead = false;
       },
       { passive: true },
     );
     input.addEventListener(
       "touchmove",
       (event) => {
-        if (touchX === null || input.scrollWidth <= input.clientWidth) return;
-        if (!panning) {
-          if (Date.now() - touchStart > LONG_PRESS_MS) {
-            touchX = null; // long press first — selection owns this touch
+        if (dead || pressX === null || input.scrollWidth <= input.clientWidth)
+          return;
+        const t = event.touches[0];
+        if (panX === null) {
+          const dx = t.clientX - pressX;
+          const dy = t.clientY - pressY;
+          if (Math.abs(dx) < PAN_SLOP) {
+            // Press wobble: stay native; a long-enough hold retires
+            // the touch to the OS for selection.
+            if (Date.now() - pressT > LONG_PRESS_MS) dead = true;
             return;
           }
-          panning = true;
+          if (
+            Date.now() - pressT > LONG_PRESS_MS ||
+            Math.abs(dy) > Math.abs(dx)
+          ) {
+            dead = true; // selection drag or vertical: not ours
+            return;
+          }
+          panX = t.clientX;
         }
-        const x = event.touches[0].clientX;
-        input.scrollLeft += touchX - x;
-        touchX = x;
+        input.scrollLeft += panX - t.clientX;
+        panX = t.clientX;
         event.preventDefault(); // no selection fight while panning
       },
       { passive: false },
     );
-    input.addEventListener("touchend", () => {
-      touchX = null;
-      panning = false;
-    });
+    input.addEventListener("touchend", endTouch);
+    input.addEventListener("touchcancel", endTouch);
     input.addEventListener("blur", () => {
       if (!input.value) restore();
     });
