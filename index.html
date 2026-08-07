@@ -112,7 +112,8 @@
 
     /* Submit arrow: floats a few spaces past the last character (the
        input is sized to its text, and the arrow rides its right edge),
-       surfacing once there's something to submit. */
+       surfacing only once the address is complete — its presence IS the
+       validation signal. */
     .newsletter-submit {
       position: absolute;
       left: calc(100% + 12px);
@@ -126,12 +127,12 @@
       cursor: pointer;
       opacity: 0;
       pointer-events: none;
-      /* Hiding is instant — it only happens when the field empties, and
-         a fade-out would linger over nothing. The entrance transition
-         lives on .has-text below. */
+      /* Hiding is instant — it happens when the address stops being
+         valid, and a fade-out would linger over stale state. The
+         entrance transition lives on .ready below. */
       transition: color 150ms ease;
     }
-    .newsletter-form.has-text .newsletter-submit {
+    .newsletter-form.ready .newsletter-submit {
       opacity: 1;
       transform: translate(0, -50%);
       pointer-events: auto;
@@ -143,7 +144,7 @@
     .newsletter-submit:hover { color: var(--n700); }
     .newsletter-submit svg { display: block; }
     @media (prefers-reduced-motion: reduce) {
-      .newsletter-form.has-text .newsletter-submit {
+      .newsletter-form.ready .newsletter-submit {
         transition: opacity 300ms ease, color 150ms ease;
       }
     }
@@ -237,9 +238,13 @@
     const sanitize = (text) =>
       text.replace(/[^A-Za-z0-9.!#$%&'*+/=?^_`{|}~@-]/g, "");
 
+    // The server's validity test, mirrored: the arrow only appears for
+    // addresses the endpoint will actually accept.
+    const VALID = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
     const update = () => {
       size();
-      form.classList.toggle("has-text", input.value.length > 0);
+      form.classList.toggle("ready", VALID.test(input.value.trim()));
       // Typing clears any error; the one live alert is the length cap.
       note.textContent =
         input.value.length >= 254
