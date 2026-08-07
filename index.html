@@ -76,14 +76,16 @@
        off the end of the text, so only the input takes part in the
        page's centering. */
     .newsletter-form { display: none; position: relative; }
-    /* When the arrow is present, the text+arrow pair re-centers as one
-       unit: the form shifts left by half the arrow's footprint
-       ((20px + 8px gap) / 2), animated in both directions. */
+    /* When the arrow is present, the text re-centers optically, not
+       mathematically: full compensation is 14px ((20px arrow + 8px
+       gap) / 2), but the arrow is the lightest mass on the page and
+       hangs like terminal punctuation, so the text yields only 8px and
+       keeps its own mass near true center. Animated both directions. */
     .newsletter-form {
       transition: transform 300ms cubic-bezier(0.22, 1, 0.36, 1);
     }
     .newsletter-form.ready {
-      transform: translateX(-14px);
+      transform: translateX(-8px);
     }
     .newsletter-input {
       border: 0;
@@ -142,14 +144,14 @@
     }
     .newsletter-submit:hover { color: var(--n600); }
     .newsletter-submit svg { display: block; }
-    /* The note stays page-centered: the form is shifted 14px left while
+    /* The note stays page-centered: the form is shifted 8px left while
        .ready, so the note compensates the other way, riding the same
        curve as the form's shift. */
     .form-note {
       transition: left 300ms cubic-bezier(0.22, 1, 0.36, 1);
     }
     .newsletter-form.ready .form-note {
-      left: calc(50% + 14px);
+      left: calc(50% + 8px);
     }
     @media (prefers-reduced-motion: reduce) {
       .newsletter-form { transition: none; }
