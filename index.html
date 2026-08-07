@@ -311,11 +311,11 @@
           } else if (result.error === "invalid") {
             note.textContent = "(enter a valid email address)";
           } else {
-            note.textContent = "(something went wrong — try again)";
+            note.textContent = "(something went wrong, try again)";
           }
         })
         .catch(() => {
-          note.textContent = "(something went wrong — try again)";
+          note.textContent = "(something went wrong, try again)";
         })
         .finally(() => {
           sending = false;
