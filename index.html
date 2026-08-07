@@ -278,8 +278,16 @@
 
     // novalidate on the form suppresses the browser's bubbles; these
     // notes take their place.
+    // Buttondown's embed endpoint, posted in the background so the
+    // visitor never leaves the page. The response is opaque (no CORS),
+    // so success means "the request went out" — the double-opt-in
+    // confirmation email is the real receipt, and the note says so.
+    const ENDPOINT =
+      "https://buttondown.com/api/emails/embed-subscribe/alignmentindex";
+    let sending = false;
     form.addEventListener("submit", (event) => {
       event.preventDefault();
+      if (sending) return;
       if (!input.value.trim()) {
         note.textContent = "(enter your email address)";
         input.focus();
@@ -290,9 +298,21 @@
         input.focus();
         return;
       }
-      note.textContent = "";
-      // TODO: submit to the email provider once one is wired; its
-      // success and failure messages land in this same note.
+      sending = true;
+      note.textContent = "(joining…)";
+      const body = new FormData();
+      body.append("email", input.value.trim());
+      body.append("embed", "1");
+      fetch(ENDPOINT, { method: "POST", body, mode: "no-cors" })
+        .then(() => {
+          note.textContent = "(check your inbox to confirm)";
+        })
+        .catch(() => {
+          note.textContent = "(something went wrong — try again)";
+        })
+        .finally(() => {
+          sending = false;
+        });
     });
   </script>
 </body>
