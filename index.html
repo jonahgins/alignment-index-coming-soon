@@ -357,6 +357,32 @@
     input.addEventListener("keydown", (event) => {
       if (event.key === "Escape") restore();
     });
+    // Touch: when a long address overflows the input, a horizontal drag
+    // pans it. Some mobile browsers start text selection instead of
+    // scrolling a dragged input, so translate the drag ourselves —
+    // only while there's actually hidden text.
+    let touchX = null;
+    input.addEventListener(
+      "touchstart",
+      (event) => {
+        touchX = event.touches[0].clientX;
+      },
+      { passive: true },
+    );
+    input.addEventListener(
+      "touchmove",
+      (event) => {
+        if (touchX === null || input.scrollWidth <= input.clientWidth) return;
+        const x = event.touches[0].clientX;
+        input.scrollLeft += touchX - x;
+        touchX = x;
+        event.preventDefault(); // no selection fight while panning
+      },
+      { passive: false },
+    );
+    input.addEventListener("touchend", () => {
+      touchX = null;
+    });
     input.addEventListener("blur", () => {
       if (!input.value) restore();
     });
