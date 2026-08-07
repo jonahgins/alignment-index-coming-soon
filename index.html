@@ -24,10 +24,17 @@
   <style>
     /* The site's neutral ramp (globals.css); dark is the same remap. */
     :root {
+      color-scheme: light dark;
       --bg: #ffffff;
       --n300: #d4d4d4;
       --n400: #a3a3a3;
       --n600: #525252;
+      /* The join/input/confirmation line share one type size, and the
+         width-measuring mirror must match it exactly. */
+      --line-size: 20px;
+      /* Optical re-center while the arrow is present: the form shifts
+         left by this, and the note compensates right by the same. */
+      --shift: 8px;
     }
     @media (prefers-color-scheme: dark) {
       :root {
@@ -48,7 +55,6 @@
          overscroll region can show a different grey. */
       background: var(--bg);
     }
-    :root { color-scheme: light dark; }
     body {
       margin: 0;
       background: var(--bg);
@@ -61,6 +67,14 @@
       flex-direction: column;
       align-items: center;
       justify-content: center;
+    }
+
+    /* Page state machine (body[data-state]): exactly one of the three
+       lines under the wordmark shows — rest | edit | joined. */
+    body:not([data-state="rest"]) .join,
+    body:not([data-state="edit"]) .newsletter-form,
+    body:not([data-state="joined"]) .confirmation {
+      display: none;
     }
 
     .wordmark {
@@ -76,7 +90,7 @@
       background: none;
       padding: 0;
       font: inherit;
-      font-size: 20px;
+      font-size: var(--line-size);
       color: var(--n400);
       cursor: pointer;
       transition: color 150ms ease;
@@ -92,20 +106,20 @@
       .newsletter-submit:hover { color: var(--n600); }
     }
 
-    /* Active state: the line becomes a boxless input; the arrow hangs
+    /* Edit state: the line becomes a boxless input; the arrow hangs
        off the end of the text, so only the input takes part in the
-       page's centering. */
-    .newsletter-form { display: none; position: relative; }
-    /* When the arrow is present, the text re-centers optically, not
-       mathematically: full compensation is 14px ((20px arrow + 8px
-       gap) / 2), but the arrow is the lightest mass on the page and
-       hangs like terminal punctuation, so the text yields only 8px and
-       keeps its own mass near true center. Animated both directions. */
+       page's centering. When the arrow is present, the text re-centers
+       optically, not mathematically: full compensation would be 14px
+       ((20px arrow + 8px gap) / 2), but the arrow is the lightest mass
+       on the page and hangs like terminal punctuation, so the text
+       yields only --shift and keeps its own mass near true center.
+       Animated both directions. */
     .newsletter-form {
+      position: relative;
       transition: transform 300ms cubic-bezier(0.22, 1, 0.36, 1);
     }
     .newsletter-form.ready {
-      transform: translateX(-8px);
+      transform: translateX(calc(-1 * var(--shift)));
     }
     .newsletter-input {
       border: 0;
@@ -115,7 +129,7 @@
          clip boundary (stray half-pixel slivers otherwise). */
       padding: 0 1px;
       font: inherit;
-      font-size: 20px;
+      font-size: var(--line-size);
       color: var(--n400);
       max-width: calc(100vw - 96px);
     }
@@ -182,30 +196,16 @@
 
     /* Terminal state: the whole line yields to the confirmation, set in
        the input's own type. */
-    .joined {
-      font-size: 20px;
+    .confirmation {
+      font-size: var(--line-size);
       color: var(--n400);
       margin: 0;
     }
-    /* The note stays page-centered: the form is shifted 8px left while
-       .ready, so the note compensates the other way, riding the same
-       curve as the form's shift. */
-    .form-note {
-      transition: left 300ms cubic-bezier(0.22, 1, 0.36, 1);
-    }
-    .newsletter-form.ready .form-note {
-      left: calc(50% + 8px);
-    }
-    @media (prefers-reduced-motion: reduce) {
-      .newsletter-form { transition: none; }
-      .form-note { transition: none; }
-      .newsletter-submit {
-        transition: opacity 300ms ease, color 150ms ease;
-      }
-    }
 
     /* Messages sit below the input line, absolutely positioned so their
-       arrival never shifts the centered composition. */
+       arrival never shifts the centered composition. The note stays
+       page-centered: the form is shifted --shift left while .ready, so
+       the note compensates the other way, riding the same curve. */
     .form-note {
       position: absolute;
       top: calc(100% + 10px);
@@ -215,6 +215,18 @@
       font-size: 14px;
       color: var(--n400);
       white-space: nowrap;
+      transition: left 300ms cubic-bezier(0.22, 1, 0.36, 1);
+    }
+    .newsletter-form.ready .form-note {
+      left: calc(50% + var(--shift));
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .newsletter-form { transition: none; }
+      .form-note { transition: none; }
+      .newsletter-submit {
+        transition: opacity 300ms ease, color 150ms ease;
+      }
     }
 
     /* Hidden mirror for measuring the text width the input should take. */
@@ -222,11 +234,11 @@
       position: absolute;
       visibility: hidden;
       white-space: pre;
-      font-size: 20px;
+      font-size: var(--line-size);
     }
   </style>
 </head>
-<body>
+<body data-state="rest">
   <h1 class="wordmark">The Alignment Index</h1>
 
   <button type="button" class="join" id="join-button">Get updates</button>
@@ -257,19 +269,27 @@
     </button>
     <p class="form-note" id="form-note" aria-live="polite"></p>
   </form>
-  <p class="joined" id="joined" hidden>You&rsquo;re on the list</p>
+  <!-- Filled and shown on success; role="status" announces it to
+       screen readers (the visual note region is emptied then). -->
+  <p class="confirmation" id="confirmation" role="status"></p>
   <span class="measure" id="measure" aria-hidden="true"></span>
 
   <script>
-    // "Join newsletter" becomes a bare input in place; Escape (or
-    // leaving the empty field) restores it. The input is continually
-    // sized to its content so the arrow floats just past the last
-    // character.
+    // "Get updates" becomes a bare input in place; Escape (or leaving
+    // the empty field) restores it. The input is continually sized to
+    // its content so the arrow floats just past the last character.
+    // Which line shows is one state attribute on <body> — rest | edit |
+    // joined — with the CSS state rules deciding visibility.
     const join = document.getElementById("join-button");
     const form = document.getElementById("newsletter-form");
     const input = document.getElementById("newsletter-input");
     const measure = document.getElementById("measure");
     const note = document.getElementById("form-note");
+    const confirmation = document.getElementById("confirmation");
+
+    const setState = (state) => {
+      document.body.dataset.state = state;
+    };
 
     const size = () => {
       measure.textContent = input.value || input.placeholder;
@@ -280,15 +300,13 @@
     };
 
     join.addEventListener("click", () => {
-      join.style.display = "none";
-      form.style.display = "block";
+      setState("edit");
       size();
       input.focus();
     });
 
     const restore = () => {
-      form.style.display = "none";
-      join.style.display = "block";
+      setState("rest");
       note.textContent = "";
     };
     // Only characters that can appear in an address (the HTML email
@@ -348,33 +366,36 @@
     // is readable, so the notes reflect what actually happened.
     const ENDPOINT =
       "https://script.google.com/macros/s/AKfycbyahi2CYYr-EClIJbQWX4OSE6ZQ0eBbm0w9ApZ_ovA0_VMF17ZsJ6_VjOyLyVYO_uTUPA/exec";
-    let sending = false;
     form.addEventListener("submit", (event) => {
       event.preventDefault();
-      if (sending) return;
-      if (!input.value.trim()) {
+      if (form.classList.contains("sending")) return;
+      const email = input.value.trim();
+      if (!email) {
         note.textContent = "(enter your email address)";
         input.focus();
         return;
       }
-      if (input.validity.typeMismatch) {
+      // Same VALID test as the arrow and the server — one validator
+      // everywhere; the server's "invalid" reply below is pure defense.
+      if (!VALID.test(email)) {
         note.textContent = "(enter a valid email address)";
         input.focus();
         return;
       }
-      sending = true;
       form.classList.add("sending");
       fetch(ENDPOINT, {
         method: "POST",
-        body: new URLSearchParams({ email: input.value.trim() }),
+        body: new URLSearchParams({ email }),
       })
         .then((response) => response.json())
         .then((result) => {
           if (result.ok) {
-            // Terminal state: the line becomes the confirmation.
+            // Terminal state: the line becomes the confirmation. State
+            // first, then text — inserting into the visible status
+            // region is what makes screen readers announce it.
             note.textContent = "";
-            form.style.display = "none";
-            document.getElementById("joined").hidden = false;
+            setState("joined");
+            confirmation.textContent = "You’re on the list";
           } else if (result.error === "invalid") {
             note.textContent = "(enter a valid email address)";
           } else {
@@ -385,7 +406,6 @@
           note.textContent = "(something went wrong, try again)";
         })
         .finally(() => {
-          sending = false;
           form.classList.remove("sending");
         });
     });
