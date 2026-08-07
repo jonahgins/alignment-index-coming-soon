@@ -144,6 +144,25 @@
     }
     .newsletter-submit:hover { color: var(--n600); }
     .newsletter-submit svg { display: block; }
+    /* In flight, the arrow becomes the spinner in place. */
+    .newsletter-submit .spinner { display: none; }
+    .newsletter-form.sending .arrow-icon { display: none; }
+    .newsletter-form.sending .spinner {
+      display: block;
+      animation: spin 700ms linear infinite;
+    }
+    .newsletter-form.sending .newsletter-submit { pointer-events: none; }
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    /* Terminal state: the whole line yields to the confirmation, set in
+       the input's own type. */
+    .joined {
+      font-size: 20px;
+      color: var(--n400);
+      margin: 0;
+    }
     /* The note stays page-centered: the form is shifted 8px left while
        .ready, so the note compensates the other way, riding the same
        curve as the form's shift. */
@@ -187,8 +206,6 @@
   <h1 class="wordmark">The Alignment Index</h1>
 
   <button type="button" class="join" id="join-button">Join newsletter</button>
-  <!-- TODO: point the form at the email provider (e.g. Buttondown) once
-       one is chosen; until then submitting does nothing. -->
   <form class="newsletter-form" id="newsletter-form" autocomplete="off" novalidate>
     <input
       class="newsletter-input"
@@ -204,13 +221,19 @@
       aria-label="Email address"
     >
     <button type="submit" class="newsletter-submit" aria-label="Submit email">
-      <svg width="20" height="20" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+      <svg class="arrow-icon" width="20" height="20" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
         <path d="M2.5 8h11"/>
         <path d="M9 3.5 13.5 8 9 12.5"/>
+      </svg>
+      <!-- While the request is in flight the arrow becomes a spinner:
+           the same stroke weight, a three-quarter arc. -->
+      <svg class="spinner" width="20" height="20" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" aria-hidden="true">
+        <path d="M8 1.5 A 6.5 6.5 0 1 1 1.5 8"/>
       </svg>
     </button>
     <p class="form-note" id="form-note" aria-live="polite"></p>
   </form>
+  <p class="joined" id="joined" hidden>You&rsquo;re on the list.</p>
   <span class="measure" id="measure" aria-hidden="true"></span>
 
   <script>
@@ -316,7 +339,7 @@
         return;
       }
       sending = true;
-      note.textContent = "(joining…)";
+      form.classList.add("sending");
       fetch(ENDPOINT, {
         method: "POST",
         body: new URLSearchParams({ email: input.value.trim() }),
@@ -324,7 +347,10 @@
         .then((response) => response.json())
         .then((result) => {
           if (result.ok) {
-            note.textContent = "(you're on the list)";
+            // Terminal state: the line becomes the confirmation.
+            note.textContent = "";
+            form.style.display = "none";
+            document.getElementById("joined").hidden = false;
           } else if (result.error === "invalid") {
             note.textContent = "(enter a valid email address)";
           } else {
@@ -336,6 +362,7 @@
         })
         .finally(() => {
           sending = false;
+          form.classList.remove("sending");
         });
     });
   </script>
