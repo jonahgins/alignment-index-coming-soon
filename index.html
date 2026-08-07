@@ -20,24 +20,16 @@
     /* The site's neutral ramp (globals.css); dark is the same remap. */
     :root {
       --bg: #ffffff;
-      --n100: #f5f5f5;
-      --n200: #e5e5e5;
-      --n300: #d4d4d4;
       --n400: #a3a3a3;
       --n500: #737373;
       --n600: #525252;
-      --n700: #404040;
     }
     @media (prefers-color-scheme: dark) {
       :root {
         --bg: #0f0f0f;
-        --n100: #1f1f1f;
-        --n200: #2e2e2e;
-        --n300: #404040;
         --n400: #8a8a8a;
         --n500: #a3a3a3;
         --n600: #c7c7c7;
-        --n700: #dedede;
       }
     }
 
@@ -51,7 +43,7 @@
     body {
       margin: 0;
       background: var(--bg);
-      color: var(--n700);
+      color: var(--n600);
       font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
       font-weight: 500;
       display: flex;
@@ -78,7 +70,7 @@
       cursor: pointer;
       transition: color 150ms ease;
     }
-    .join:hover { color: var(--n700); }
+    .join:hover { color: var(--n600); }
 
     /* Active state: the line becomes a boxless input; the arrow hangs
        off the end of the text, so only the input takes part in the
@@ -148,7 +140,7 @@
       transform: translate(0, -50%);
       pointer-events: auto;
     }
-    .newsletter-submit:hover { color: var(--n700); }
+    .newsletter-submit:hover { color: var(--n600); }
     .newsletter-submit svg { display: block; }
     /* The note stays page-centered: the form is shifted 14px left while
        .ready, so the note compensates the other way, riding the same
