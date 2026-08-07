@@ -3,6 +3,11 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
+  <!-- Tell the browser our actual colors so its own surfaces (canvas,
+       status/gesture areas) match instead of guessing a darker black. -->
+  <meta name="color-scheme" content="light dark">
+  <meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#0f0f0f" media="(prefers-color-scheme: dark)">
   <title>The Alignment Index</title>
   <meta name="description" content="A plain-language index of AI alignment topics and misalignment incidents. Coming soon.">
   <meta property="og:title" content="The Alignment Index">
@@ -39,7 +44,11 @@
       height: 100%;
       overflow: hidden;
       overscroll-behavior: none;
+      /* The root paints the same ground as the body, so no canvas or
+         overscroll region can show a different grey. */
+      background: var(--bg);
     }
+    :root { color-scheme: light dark; }
     body {
       margin: 0;
       background: var(--bg);
