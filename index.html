@@ -1,0 +1,294 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>The Alignment Index</title>
+  <meta name="description" content="A plain-language index of AI alignment topics and misalignment incidents. Coming soon.">
+  <meta property="og:title" content="The Alignment Index">
+  <meta property="og:description" content="A plain-language index of AI alignment topics and misalignment incidents. Coming soon.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://thealignmentindex.org/">
+  <link rel="canonical" href="https://thealignmentindex.org/">
+  <!-- TODO: og:image once a share card exists. -->
+  <style>
+    /* The site's neutral ramp (globals.css); dark is the same remap. */
+    :root {
+      --bg: #ffffff;
+      --n100: #f5f5f5;
+      --n200: #e5e5e5;
+      --n300: #d4d4d4;
+      --n400: #a3a3a3;
+      --n500: #737373;
+      --n600: #525252;
+      --n700: #404040;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg: #0f0f0f;
+        --n100: #1f1f1f;
+        --n200: #2e2e2e;
+        --n300: #404040;
+        --n400: #8a8a8a;
+        --n500: #a3a3a3;
+        --n600: #c7c7c7;
+        --n700: #dedede;
+      }
+    }
+
+    /* No scrolling or rubber-band overscroll — the page is one fixed
+       viewport (same overscroll rule as the prototype). */
+    html, body {
+      height: 100%;
+      overflow: hidden;
+      overscroll-behavior: none;
+    }
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--n700);
+      font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+      font-weight: 500;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .wordmark {
+      font-size: 30px; /* text-3xl */
+      font-weight: 500;
+      color: var(--n600);
+      margin: 0 0 24px;
+    }
+
+    /* Rest state: a bare text line, the sidebar menu-item treatment. */
+    .join {
+      border: 0;
+      background: none;
+      padding: 0;
+      font: inherit;
+      font-size: 20px;
+      color: var(--n400);
+      cursor: pointer;
+      transition: color 150ms ease;
+    }
+    .join:hover { color: var(--n700); }
+
+    /* Active state: the line becomes a boxless input; the arrow hangs
+       off the end of the text, so only the input takes part in the
+       page's centering. */
+    .newsletter-form { display: none; position: relative; }
+    .newsletter-input {
+      border: 0;
+      background: none;
+      outline: none;
+      /* 1px each side keeps Safari's subpixel glyph edges clear of the
+         clip boundary (stray half-pixel slivers otherwise). */
+      padding: 0 1px;
+      font: inherit;
+      font-size: 20px;
+      color: var(--n500);
+      max-width: calc(100vw - 96px);
+    }
+    .newsletter-input::placeholder { color: var(--n400); }
+    /* Defeat the browser's autofill tint: paint the page color back over
+       it and keep the text in the input's grey. */
+    .newsletter-input:-webkit-autofill,
+    .newsletter-input:-webkit-autofill:hover,
+    .newsletter-input:-webkit-autofill:focus {
+      -webkit-box-shadow: 0 0 0 1000px var(--bg) inset;
+      -webkit-text-fill-color: var(--n500);
+      transition: background-color 9999s ease-out;
+    }
+    .newsletter-input:autofill {
+      box-shadow: 0 0 0 1000px var(--bg) inset;
+    }
+
+    /* Submit arrow: floats a few spaces past the last character (the
+       input is sized to its text, and the arrow rides its right edge),
+       surfacing once there's something to submit. */
+    .newsletter-submit {
+      position: absolute;
+      left: calc(100% + 12px);
+      top: 50%;
+      transform: translate(-6px, -50%);
+      display: flex;
+      border: 0;
+      background: none;
+      padding: 0;
+      color: var(--n400);
+      cursor: pointer;
+      opacity: 0;
+      pointer-events: none;
+      /* Hiding is instant — it only happens when the field empties, and
+         a fade-out would linger over nothing. The entrance transition
+         lives on .has-text below. */
+      transition: color 150ms ease;
+    }
+    .newsletter-form.has-text .newsletter-submit {
+      opacity: 1;
+      transform: translate(0, -50%);
+      pointer-events: auto;
+      transition:
+        opacity 300ms ease,
+        transform 300ms cubic-bezier(0.22, 1, 0.36, 1),
+        color 150ms ease;
+    }
+    .newsletter-submit:hover { color: var(--n700); }
+    .newsletter-submit svg { display: block; }
+    @media (prefers-reduced-motion: reduce) {
+      .newsletter-form.has-text .newsletter-submit {
+        transition: opacity 300ms ease, color 150ms ease;
+      }
+    }
+
+    /* Messages sit below the input line, absolutely positioned so their
+       arrival never shifts the centered composition. */
+    .form-note {
+      position: absolute;
+      top: calc(100% + 10px);
+      left: 50%;
+      transform: translateX(-50%);
+      margin: 0;
+      font-size: 14px;
+      color: var(--n400);
+      white-space: nowrap;
+    }
+
+    /* Hidden mirror for measuring the text width the input should take. */
+    .measure {
+      position: absolute;
+      visibility: hidden;
+      white-space: pre;
+      font-size: 20px;
+    }
+  </style>
+</head>
+<body>
+  <h1 class="wordmark">The Alignment Index</h1>
+
+  <button type="button" class="join" id="join-button">Join newsletter</button>
+  <!-- TODO: point the form at the email provider (e.g. Buttondown) once
+       one is chosen; until then submitting does nothing. -->
+  <form class="newsletter-form" id="newsletter-form" autocomplete="off" novalidate>
+    <input
+      class="newsletter-input"
+      id="newsletter-input"
+      type="email"
+      name="nl"
+      maxlength="254"
+      placeholder="Email address"
+      autocomplete="off"
+      autocorrect="off"
+      autocapitalize="off"
+      spellcheck="false"
+      aria-label="Email address"
+    >
+    <button type="submit" class="newsletter-submit" aria-label="Submit email">
+      <svg width="20" height="20" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <path d="M2.5 8h11"/>
+        <path d="M9 3.5 13.5 8 9 12.5"/>
+      </svg>
+    </button>
+    <p class="form-note" id="form-note" aria-live="polite"></p>
+  </form>
+  <span class="measure" id="measure" aria-hidden="true"></span>
+
+  <script>
+    // "Join newsletter" becomes a bare input in place; Escape (or
+    // leaving the empty field) restores it. The input is continually
+    // sized to its content so the arrow floats just past the last
+    // character.
+    const join = document.getElementById("join-button");
+    const form = document.getElementById("newsletter-form");
+    const input = document.getElementById("newsletter-input");
+    const measure = document.getElementById("measure");
+    const note = document.getElementById("form-note");
+
+    const size = () => {
+      measure.textContent = input.value || input.placeholder;
+      // Subpixel-accurate width (offsetWidth truncates, which lets
+      // Safari clip glyph edges), rounded up plus room for the caret.
+      const width = measure.getBoundingClientRect().width;
+      input.style.width = Math.ceil(width) + 2 + "px";
+    };
+
+    join.addEventListener("click", () => {
+      join.style.display = "none";
+      form.style.display = "block";
+      size();
+      input.focus();
+    });
+
+    const restore = () => {
+      form.style.display = "none";
+      join.style.display = "block";
+      note.textContent = "";
+    };
+    // Only characters that can appear in an address (the HTML email
+    // spec's set) ever land in the field — spaces and everything else
+    // are dropped at the door, typed or pasted.
+    const sanitize = (text) =>
+      text.replace(/[^A-Za-z0-9.!#$%&'*+/=?^_`{|}~@-]/g, "");
+
+    const update = () => {
+      size();
+      form.classList.toggle("has-text", input.value.length > 0);
+      // Typing clears any error; the one live alert is the length cap.
+      note.textContent =
+        input.value.length >= 254
+          ? "(email addresses max out at 254 characters)"
+          : "";
+    };
+
+    input.addEventListener("beforeinput", (event) => {
+      if (!event.data) return;
+      const clean = sanitize(event.data);
+      if (clean === event.data) return;
+      event.preventDefault(); // blocks the keystroke outright
+      // Keep the valid remainder only for real pastes. Other mixed
+      // insertions are OS substitutions — e.g. double-space arriving as
+      // ". " — and must be dropped whole, not salvaged into a period.
+      if (clean && event.inputType === "insertFromPaste") {
+        input.value = sanitize(input.value + clean);
+        update();
+      }
+    });
+    input.addEventListener("input", () => {
+      // Safety net for routes beforeinput misses (drag-drop, autofill).
+      const clean = sanitize(input.value);
+      if (clean !== input.value) input.value = clean;
+      update();
+    });
+    input.addEventListener("keydown", (event) => {
+      if (event.key === "Escape") restore();
+    });
+    input.addEventListener("blur", () => {
+      if (!input.value) restore();
+    });
+    // Belt and braces alongside novalidate: even if something triggers
+    // reportValidity(), no native bubble ever surfaces.
+    input.addEventListener("invalid", (event) => event.preventDefault());
+
+    // novalidate on the form suppresses the browser's bubbles; these
+    // notes take their place.
+    form.addEventListener("submit", (event) => {
+      event.preventDefault();
+      if (!input.value.trim()) {
+        note.textContent = "(enter your email address)";
+        input.focus();
+        return;
+      }
+      if (input.validity.typeMismatch) {
+        note.textContent = "(enter a valid email address)";
+        input.focus();
+        return;
+      }
+      note.textContent = "";
+      // TODO: submit to the email provider once one is wired; its
+      // success and failure messages land in this same note.
+    });
+  </script>
+</body>
+</html>
