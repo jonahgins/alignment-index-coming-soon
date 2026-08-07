@@ -278,12 +278,12 @@
 
     // novalidate on the form suppresses the browser's bubbles; these
     // notes take their place.
-    // Buttondown's embed endpoint, posted in the background so the
-    // visitor never leaves the page. The response is opaque (no CORS),
-    // so success means "the request went out" — the double-opt-in
-    // confirmation email is the real receipt, and the note says so.
+    // The waitlist endpoint: an Apps Script web app that appends to a
+    // private Google Sheet. URLSearchParams keeps the POST a CORS
+    // "simple request" (no preflight), and the script's JSON response
+    // is readable, so the notes reflect what actually happened.
     const ENDPOINT =
-      "https://buttondown.com/api/emails/embed-subscribe/alignmentindex";
+      "https://script.google.com/macros/s/AKfycbyahi2CYYr-EClIJbQWX4OSE6ZQ0eBbm0w9ApZ_ovA0_VMF17ZsJ6_VjOyLyVYO_uTUPA/exec";
     let sending = false;
     form.addEventListener("submit", (event) => {
       event.preventDefault();
@@ -300,12 +300,19 @@
       }
       sending = true;
       note.textContent = "(joining…)";
-      const body = new FormData();
-      body.append("email", input.value.trim());
-      body.append("embed", "1");
-      fetch(ENDPOINT, { method: "POST", body, mode: "no-cors" })
-        .then(() => {
-          note.textContent = "(check your inbox to confirm)";
+      fetch(ENDPOINT, {
+        method: "POST",
+        body: new URLSearchParams({ email: input.value.trim() }),
+      })
+        .then((response) => response.json())
+        .then((result) => {
+          if (result.ok) {
+            note.textContent = "(you're on the list)";
+          } else if (result.error === "invalid") {
+            note.textContent = "(enter a valid email address)";
+          } else {
+            note.textContent = "(something went wrong — try again)";
+          }
         })
         .catch(() => {
           note.textContent = "(something went wrong — try again)";
