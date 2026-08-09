@@ -39,6 +39,13 @@
       /* Optical re-center while the arrow is present: the form shifts
          left by this, and the note compensates right by the same. */
       --shift: 8px;
+      /* Invisible right padding inside the input: password managers and
+         email-hiding extensions anchor their icons to the field's right
+         edge, so this parks them past the text and the arrow slot
+         (8px gap + 20px arrow + ~28px icon zone) instead of on top of
+         the text. Compensated by an equal left margin so the text stays
+         page-centered. */
+      --tail: 56px;
     }
     @media (prefers-color-scheme: dark) {
       :root {
@@ -129,13 +136,16 @@
       border: 0;
       background: none;
       outline: none;
-      /* 1px each side keeps Safari's subpixel glyph edges clear of the
-         clip boundary (stray half-pixel slivers otherwise). */
-      padding: 0 1px;
+      /* Left: 1px keeps Safari's subpixel glyph edges clear of the clip
+         boundary (stray half-pixel slivers otherwise). Right: the
+         extension-icon tail; the margin mirrors the asymmetry so the
+         text itself stays page-centered. */
+      padding: 0 var(--tail) 0 1px;
+      margin-left: calc(var(--tail) - 1px);
       font: inherit;
       font-size: var(--line-size);
       color: var(--n400);
-      max-width: calc(100vw - 96px);
+      max-width: calc(100vw - 162px);
     }
     .newsletter-input::placeholder { color: var(--n300); }
     /* Defeat the browser's autofill tint: paint the page color back over
@@ -157,7 +167,9 @@
        validation signal. */
     .newsletter-submit {
       position: absolute;
-      left: calc(100% + 8px);
+      /* Anchored 8px past the text: the form's right edge now includes
+         the --tail padding, so subtract it back out. */
+      left: calc(100% - var(--tail) + 8px);
       top: 50%;
       transform: translate(-6px, -50%);
       display: flex;
