@@ -39,12 +39,14 @@
       /* Optical re-center while the arrow is present: the form shifts
          left by this, and the note compensates right by the same. */
       --shift: 8px;
-      /* Invisible right padding inside the input: password managers and
-         email-hiding extensions anchor their icons to the field's right
-         edge, so this parks them past the text and the arrow slot
-         (8px gap + 20px arrow + ~28px icon zone) instead of on top of
-         the text. Compensated by an equal left margin so the text stays
-         page-centered. */
+      /* Invisible tail on the input's right: password managers and
+         email-hiding extensions anchor icons to the field's right edge,
+         so this parks them past the text and the arrow slot (8px gap +
+         20px arrow + ~28px icon zone) instead of on top of the text.
+         The tail lives in the CONTENT width (added in size()), not
+         padding: DuckDuckGo anchors with background-origin:content-box,
+         which ignores padding. Compensated by the input's left margin
+         so the text stays page-centered. */
       --tail: 56px;
     }
     @media (prefers-color-scheme: dark) {
@@ -136,16 +138,15 @@
       border: 0;
       background: none;
       outline: none;
-      /* Left: 1px keeps Safari's subpixel glyph edges clear of the clip
-         boundary (stray half-pixel slivers otherwise). Right: the
-         extension-icon tail; the margin mirrors the asymmetry so the
-         text itself stays page-centered. */
-      padding: 0 var(--tail) 0 1px;
-      margin-left: calc(var(--tail) - 1px);
+      /* 1px each side keeps Safari's subpixel glyph edges clear of the
+         clip boundary (stray half-pixel slivers otherwise). The
+         extension-icon tail is part of the width (see size()); the
+         margin mirrors it so the text itself stays page-centered. */
+      padding: 0 1px;
+      margin-left: var(--tail);
       font: inherit;
       font-size: var(--line-size);
       color: var(--n400);
-      max-width: calc(100vw - 162px);
     }
     .newsletter-input::placeholder { color: var(--n300); }
     /* Defeat the browser's autofill tint: paint the page color back over
@@ -167,9 +168,10 @@
        validation signal. */
     .newsletter-submit {
       position: absolute;
-      /* Anchored 8px past the text: the form's right edge now includes
-         the --tail padding, so subtract it back out. */
-      left: calc(100% - var(--tail) + 8px);
+      /* Anchored 8px past the text: the form's right edge includes the
+         --tail content extension, so subtract it back out (+7 rather
+         than +8 absorbs the input's 1px right padding). */
+      left: calc(100% - var(--tail) + 7px);
       top: 50%;
       transform: translate(-6px, -50%);
       display: flex;
@@ -307,13 +309,28 @@
       document.body.dataset.state = state;
     };
 
+    // The extension-icon tail (see the --tail token) lives in the
+    // content width, where DuckDuckGo-style content-box-anchored icons
+    // respect it.
+    const TAIL =
+      parseFloat(
+        getComputedStyle(document.documentElement).getPropertyValue("--tail"),
+      ) || 56;
+
     const size = () => {
       measure.textContent = input.value || input.placeholder;
       // Subpixel-accurate width (offsetWidth truncates, which lets
       // Safari clip glyph edges), rounded up plus room for the caret.
+      // The viewport cap applies to the TEXT region only, so the icon
+      // tail survives intact on narrow screens (long text scrolls).
       const width = measure.getBoundingClientRect().width;
-      input.style.width = Math.ceil(width) + 2 + "px";
+      const cap = Math.max(window.innerWidth - 162, 80);
+      const text = Math.min(Math.ceil(width) + 2, cap);
+      input.style.width = text + TAIL + "px";
     };
+    window.addEventListener("resize", () => {
+      if (document.body.dataset.state === "edit") size();
+    });
 
     join.addEventListener("click", () => {
       setState("edit");
