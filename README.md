@@ -1,4 +1,4 @@
-# thealignmentindex.org — coming soon
+# theindex.org — coming soon
 
 Static holding page for The Index. One interactive page
 (`index.html`), a 404, and generated brand assets. No build step, no
@@ -6,7 +6,7 @@ dependencies.
 
 ## Deployment
 
-Pushes to `main` deploy via GitHub Pages to https://thealignmentindex.org
+Pushes to `main` deploy via GitHub Pages to https://theindex.org
 (custom domain via `CNAME`, DNS at Name.com, HTTPS enforced). This
 repo's local git config authenticates through `gh` (account:
 jonahgins) — plain pushes just work from this folder.
