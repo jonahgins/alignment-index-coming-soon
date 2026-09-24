@@ -1,6 +1,6 @@
 # thealignmentindex.org — coming soon
 
-Static holding page for The Alignment Index. One interactive page
+Static holding page for The Index. One interactive page
 (`index.html`), a 404, and generated brand assets. No build step, no
 dependencies.
 
