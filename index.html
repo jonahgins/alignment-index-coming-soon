@@ -83,18 +83,23 @@
     }
 
     /* Page state machine (body[data-state]): exactly one of the three
-       lines under the wordmark shows — rest | edit | joined. */
+       lines shows — rest | edit | joined. */
     body:not([data-state="rest"]) .join,
     body:not([data-state="edit"]) .newsletter-form,
     body:not([data-state="joined"]) .confirmation {
       display: none;
     }
 
-    .wordmark {
-      font-size: 30px; /* text-3xl */
-      font-weight: 500;
-      color: var(--n600);
-      margin: 0 0 16px;
+    /* The page's name stays in the document for screen readers and
+       search, but the only visible thing is the one line. */
+    .visually-hidden {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0 0 0 0);
+      white-space: nowrap;
     }
 
     /* Rest state: a bare text line, the sidebar menu-item treatment. */
@@ -257,7 +262,7 @@
   </style>
 </head>
 <body data-state="rest">
-  <h1 class="wordmark">The Index</h1>
+  <h1 class="visually-hidden">The Index</h1>
 
   <button type="button" class="join" id="join-button">Get updates</button>
   <form class="newsletter-form" id="newsletter-form" autocomplete="off" novalidate>
