@@ -115,6 +115,12 @@
       color: var(--n600);
       text-wrap: pretty;
     }
+    /* Phone widths: pretty can still strand "own work." — balance
+       evens the lines instead. Not below ~340px, where the paragraph
+       exceeds balance's line limit and falls back to plain wrapping. */
+    @media (max-width: 480px) and (min-width: 340px) {
+      .intro { text-wrap: balance; }
+    }
 
     /* Keeps a phrase from breaking at its hyphen. */
     .nowrap { white-space: nowrap; }
@@ -281,7 +287,7 @@
 <body data-state="rest">
   <h1 class="visually-hidden">The Index</h1>
 
-  <p class="intro">The Index is building tools to help the public make sense of AI safety. For our first initiative, we’re producing expert interview segments and <span class="nowrap">“open-sourcing”</span> them so that creators and video journalists can use them in their own work.</p>
+  <p class="intro">The Index is building tools to help the public make sense of AI safety. For our first initiative, we’re producing expert interview segments and <span class="nowrap">“open-sourcing”</span> them so creators and video journalists can use them in their own work.</p>
 
   <button type="button" class="join" id="join-button">Get updates</button>
   <form class="newsletter-form" id="newsletter-form" autocomplete="off" novalidate>
