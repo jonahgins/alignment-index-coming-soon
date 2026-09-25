@@ -91,7 +91,7 @@
     }
 
     /* The page's name stays in the document for screen readers and
-       search, but the only visible thing is the one line. */
+       search, but isn't shown. */
     .visually-hidden {
       position: absolute;
       width: 1px;
@@ -100,6 +100,19 @@
       overflow: hidden;
       clip: rect(0 0 0 0);
       white-space: nowrap;
+    }
+
+    /* The intro paragraph sits above the Get-updates line; the two are
+       centered together as one group (body's flex column), so the line
+       itself is no longer at dead center. Left-aligned text in a
+       centered measure; the 16px gutters apply at phone width. */
+    .intro {
+      width: min(30rem, calc(100% - 32px));
+      margin: 0 0 64px;
+      font-size: 17px;
+      line-height: 1.5;
+      color: var(--n600);
+      text-wrap: pretty;
     }
 
     /* Rest state: a bare text line, the sidebar menu-item treatment. */
@@ -263,6 +276,8 @@
 </head>
 <body data-state="rest">
   <h1 class="visually-hidden">The Index</h1>
+
+  <p class="intro">The Index is building tools to help the public make sense of AI safety. For our first initiative, we’re producing expert interview segments and “open-sourcing” them so that creators and video journalists can use them in their own work.</p>
 
   <button type="button" class="join" id="join-button">Get updates</button>
   <form class="newsletter-form" id="newsletter-form" autocomplete="off" novalidate>
