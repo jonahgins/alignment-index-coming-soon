@@ -8,8 +8,10 @@ dependencies.
 
 Pushes to `main` deploy via GitHub Pages to https://theindex.org
 (custom domain via `CNAME`, DNS at Name.com, HTTPS enforced). This
-repo's local git config authenticates through `gh` (account:
-jonahgins) — plain pushes just work from this folder.
+repo's local git config has a credential helper that pulls the
+`jonahgins` token from `gh`'s keyring (`gh auth token --user
+jonahgins`), so plain pushes work from this folder regardless of
+which account is active in `gh`.
 
 ## Signups
 
