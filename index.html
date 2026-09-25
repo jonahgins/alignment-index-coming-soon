@@ -104,11 +104,15 @@
 
     /* The intro paragraph sits above the Get-updates line; the two are
        centered together as one group (body's flex column), so the line
-       itself is no longer at dead center. Centered text in a capped
-       measure, sized so the paragraph ends on a full line;
-       the 16px gutters apply at phone width. */
+       itself is no longer at dead center. Centered text at one of two
+       fixed measures, each chosen so every line breaks cleanly and the
+       paragraph ends on a full line. Widths are in em so the wrap is
+       tied to the type size: 22em (374px) gives five lines; 19.1em
+       (325px) gives six. Rather than let a narrower phone re-wrap the
+       text, the type scales down with the viewport (16px gutters) and
+       the six-line break holds. */
     .intro {
-      width: min(23.5rem, calc(100% - 32px));
+      width: 22em;
       text-align: center;
       margin: 0 0 64px;
       font-size: 17px;
@@ -116,11 +120,12 @@
       color: var(--n600);
       text-wrap: pretty;
     }
-    /* Phone widths: pretty can still strand "own work." — balance
-       evens the lines instead. Not below ~340px, where the paragraph
-       exceeds balance's line limit and falls back to plain wrapping. */
-    @media (max-width: 480px) and (min-width: 340px) {
-      .intro { text-wrap: balance; }
+    /* Under 406px the five-line measure no longer fits in the gutters. */
+    @media (max-width: 405px) {
+      .intro {
+        width: 19.1em;
+        font-size: min(17px, calc((100vw - 32px) / 19.1));
+      }
     }
 
     /* Keeps a phrase from breaking at its hyphen. */
