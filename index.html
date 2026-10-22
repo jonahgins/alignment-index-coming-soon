@@ -9,9 +9,9 @@
   <meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)">
   <meta name="theme-color" content="#0f0f0f" media="(prefers-color-scheme: dark)">
   <title>The Index</title>
-  <meta name="description" content="An initiative to help the public make sense of AI safety. First up: a library of expert interview segments, open-sourced for creators and video journalists. Coming soon.">
+  <meta name="description" content="We’re making videos with AI safety researchers about their work, and building an index to watch them all in one place. Coming soon.">
   <meta property="og:title" content="The Index">
-  <meta property="og:description" content="An initiative to help the public make sense of AI safety. First up: a library of expert interview segments, open-sourced for creators and video journalists. Coming soon.">
+  <meta property="og:description" content="We’re making videos with AI safety researchers about their work, and building an index to watch them all in one place. Coming soon.">
   <meta property="og:type" content="website">
   <meta property="og:url" content="https://theindex.org/">
   <meta property="og:image" content="https://theindex.org/og-image.png">
@@ -104,15 +104,13 @@
 
     /* The intro paragraph sits above the Get-updates line; the two are
        centered together as one group (body's flex column), so the line
-       itself is no longer at dead center. Centered text at one of two
-       fixed measures, each chosen so every line breaks cleanly and the
-       paragraph ends on a full line. Widths are in em so the wrap is
-       tied to the type size: 22em (374px) gives five lines; 19.1em
-       (325px) gives six. Rather than let a narrower phone re-wrap the
-       text, the type scales down with the viewport (16px gutters) and
-       the six-line break holds. */
+       itself is no longer at dead center. The 30em (510px) measure
+       holds the first clause, "…about their work," (508px) and no more,
+       so on desktop the line breaks before "and building". On phones the
+       measure gives way to the 16px gutters and the lines balance, so
+       no short last line. */
     .intro {
-      width: 22em;
+      max-width: min(30em, 100vw - 32px);
       text-align: center;
       margin: 0 0 64px;
       font-size: 17px;
@@ -120,16 +118,9 @@
       color: var(--n600);
       text-wrap: pretty;
     }
-    /* Under 406px the five-line measure no longer fits in the gutters. */
-    @media (max-width: 405px) {
-      .intro {
-        width: 19.1em;
-        font-size: min(17px, calc((100vw - 32px) / 19.1));
-      }
+    @media (max-width: 541px) {
+      .intro { text-wrap: balance; }
     }
-
-    /* Keeps a phrase from breaking at its hyphen. */
-    .nowrap { white-space: nowrap; }
 
     /* Rest state: a bare text line, the sidebar menu-item treatment. */
     .join {
@@ -293,7 +284,7 @@
 <body data-state="rest">
   <h1 class="visually-hidden">The Index</h1>
 
-  <p class="intro">The Index is an initiative to help the public make sense of AI safety. For our first project, we’re producing expert interview segments and <span class="nowrap">“open-sourcing”</span> them so creators and video journalists can use them in their own work.</p>
+  <p class="intro">We’re making videos with AI safety researchers about their work, and building an index to watch them all in one place.</p>
 
   <button type="button" class="join" id="join-button">Get updates</button>
   <form class="newsletter-form" id="newsletter-form" autocomplete="off" novalidate>
