@@ -9,9 +9,9 @@
   <meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)">
   <meta name="theme-color" content="#0f0f0f" media="(prefers-color-scheme: dark)">
   <title>The Index</title>
-  <meta name="description" content="We make videos with researchers working on AI safety and policy. Soon you’ll be able to watch them all on this site.">
+  <meta name="description" content="We make videos with AI safety researchers. Soon you’ll be able to browse the whole collection here.">
   <meta property="og:title" content="The Index">
-  <meta property="og:description" content="We make videos with researchers working on AI safety and policy. Soon you’ll be able to watch them all on this site.">
+  <meta property="og:description" content="We make videos with AI safety researchers. Soon you’ll be able to browse the whole collection here.">
   <meta property="og:type" content="website">
   <meta property="og:url" content="https://theindex.org/">
   <meta property="og:image" content="https://theindex.org/og-image.png">
@@ -104,11 +104,11 @@
 
     /* The intro paragraph sits above the Get-updates line; the two are
        centered together as one group (body's flex column), so the line
-       itself is no longer at dead center. The 31em (527px) measure
-       fits the longer sentence (517px) but not both, so on desktop each
+       itself is no longer at dead center. The 26em (442px) measure
+       fits the longer sentence (438px) but not both, so on desktop each
        sentence gets its own line. */
     .intro {
-      max-width: min(31em, 100vw - 32px);
+      max-width: min(26em, 100vw - 32px);
       text-align: center;
       margin: 0 0 64px;
       font-size: 17px;
@@ -118,7 +118,7 @@
     }
     /* Phones cap at 20em (340px) so both sentences wrap to two lines
        on every phone width, not one-and-two on the larger ones. */
-    @media (max-width: 558px) {
+    @media (max-width: 473px) {
       .intro {
         max-width: min(20em, 100vw - 32px);
         text-wrap: balance;
@@ -129,7 +129,7 @@
     .sentence { display: inline-block; }
 
     /* Holds a phrase on one line, so the second sentence can only
-       break between "watch" and "them". */
+       break between "browse" and "the". */
     .nowrap { white-space: nowrap; }
 
     /* Rest state: a bare text line, the sidebar menu-item treatment. */
@@ -294,7 +294,7 @@
 <body data-state="rest">
   <h1 class="visually-hidden">The Index</h1>
 
-  <p class="intro"><span class="sentence">We make videos with researchers working on AI safety and policy.</span> <span class="sentence"><span class="nowrap">Soon you’ll be able to watch</span> <span class="nowrap">them all on this site.</span></span></p>
+  <p class="intro"><span class="sentence">We make videos with AI safety researchers.</span> <span class="sentence"><span class="nowrap">Soon you’ll be able to browse</span> <span class="nowrap">the whole collection here.</span></span></p>
 
   <button type="button" class="join" id="join-button">Get updates</button>
   <form class="newsletter-form" id="newsletter-form" autocomplete="off" novalidate>
