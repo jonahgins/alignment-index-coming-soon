@@ -38,7 +38,7 @@ corner mask); its source is not committed — regenerate from:
 
     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
       <rect width="32" height="32" fill="#0f0f0f"/>
-      <circle cx="16" cy="16" r="13" fill="#a3a3a3"/>
+      <circle cx="16" cy="16" r="10" fill="#a3a3a3"/>
     </svg>
 
     qlmanage -t -s 180 -o /tmp touch-icon.svg && mv /tmp/touch-icon.svg.png apple-touch-icon.png
