@@ -9,9 +9,9 @@
   <meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)">
   <meta name="theme-color" content="#0f0f0f" media="(prefers-color-scheme: dark)">
   <title>The Index</title>
-  <meta name="description" content="We’re making videos with AI safety researchers about their work, and building an index to watch them all in one place. Coming soon.">
+  <meta name="description" content="We make videos with AI safety researchers about their work, and we’re building an index that brings them all together. Coming soon.">
   <meta property="og:title" content="The Index">
-  <meta property="og:description" content="We’re making videos with AI safety researchers about their work, and building an index to watch them all in one place. Coming soon.">
+  <meta property="og:description" content="We make videos with AI safety researchers about their work, and we’re building an index that brings them all together. Coming soon.">
   <meta property="og:type" content="website">
   <meta property="og:url" content="https://theindex.org/">
   <meta property="og:image" content="https://theindex.org/og-image.png">
@@ -104,13 +104,13 @@
 
     /* The intro paragraph sits above the Get-updates line; the two are
        centered together as one group (body's flex column), so the line
-       itself is no longer at dead center. The 30em (510px) measure
-       holds the first clause, "…about their work," (508px) and no more,
-       so on desktop the line breaks before "and building". On phones the
+       itself is no longer at dead center. The 29em (493px) measure
+       holds the first clause, "…about their work," (474px) and no more,
+       so on desktop the line breaks before "and we’re". On phones the
        measure gives way to the 16px gutters and the lines balance, so
        no short last line. */
     .intro {
-      max-width: min(30em, 100vw - 32px);
+      max-width: min(29em, 100vw - 32px);
       text-align: center;
       margin: 0 0 64px;
       font-size: 17px;
@@ -118,7 +118,7 @@
       color: var(--n600);
       text-wrap: pretty;
     }
-    @media (max-width: 541px) {
+    @media (max-width: 524px) {
       .intro { text-wrap: balance; }
     }
 
@@ -284,7 +284,7 @@
 <body data-state="rest">
   <h1 class="visually-hidden">The Index</h1>
 
-  <p class="intro">We’re making videos with AI safety researchers about their work, and building an index to watch them all in one place.</p>
+  <p class="intro">We make videos with AI safety researchers about their work, and we’re building an index that brings them all together.</p>
 
   <button type="button" class="join" id="join-button">Get updates</button>
   <form class="newsletter-form" id="newsletter-form" autocomplete="off" novalidate>
