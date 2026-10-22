@@ -9,9 +9,9 @@
   <meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)">
   <meta name="theme-color" content="#0f0f0f" media="(prefers-color-scheme: dark)">
   <title>The Index</title>
-  <meta name="description" content="We make videos with AI safety researchers about their work, and we’re building an index that brings them all together. Coming soon.">
+  <meta name="description" content="We make videos with AI safety researchers about their work. Soon you’ll be able to watch them all on this site.">
   <meta property="og:title" content="The Index">
-  <meta property="og:description" content="We make videos with AI safety researchers about their work, and we’re building an index that brings them all together. Coming soon.">
+  <meta property="og:description" content="We make videos with AI safety researchers about their work. Soon you’ll be able to watch them all on this site.">
   <meta property="og:type" content="website">
   <meta property="og:url" content="https://theindex.org/">
   <meta property="og:image" content="https://theindex.org/og-image.png">
@@ -105,8 +105,8 @@
     /* The intro paragraph sits above the Get-updates line; the two are
        centered together as one group (body's flex column), so the line
        itself is no longer at dead center. The 29em (493px) measure
-       holds the first clause, "…about their work," (474px) and no more,
-       so on desktop the line breaks before "and we’re". On phones the
+       holds the first sentence, "…about their work." (474px) and no more,
+       so on desktop each sentence gets its own line. On phones the
        measure gives way to the 16px gutters and the lines balance, so
        no short last line. */
     .intro {
@@ -118,9 +118,21 @@
       color: var(--n600);
       text-wrap: pretty;
     }
+    /* Phones cap at 20em (340px) so both sentences wrap to two lines
+       on every phone width, not one-and-two on the larger ones. */
     @media (max-width: 524px) {
-      .intro { text-wrap: balance; }
+      .intro {
+        max-width: min(20em, 100vw - 32px);
+        text-wrap: balance;
+      }
     }
+    /* Each sentence wraps within itself, so on phones the second one
+       still starts a fresh line instead of trailing the first. */
+    .sentence { display: inline-block; }
+
+    /* Holds a phrase on one line, so the second sentence can only
+       break between "watch" and "them". */
+    .nowrap { white-space: nowrap; }
 
     /* Rest state: a bare text line, the sidebar menu-item treatment. */
     .join {
@@ -284,7 +296,7 @@
 <body data-state="rest">
   <h1 class="visually-hidden">The Index</h1>
 
-  <p class="intro">We make videos with AI safety researchers about their work, and we’re building an index that brings them all together.</p>
+  <p class="intro"><span class="sentence">We make videos with AI safety researchers about their work.</span> <span class="sentence"><span class="nowrap">Soon you’ll be able to watch</span> <span class="nowrap">them all on this site.</span></span></p>
 
   <button type="button" class="join" id="join-button">Get updates</button>
   <form class="newsletter-form" id="newsletter-form" autocomplete="off" novalidate>
